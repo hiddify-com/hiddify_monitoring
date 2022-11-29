@@ -1,28 +1,123 @@
-"""CLI interface for hiddify_monitoring project.
-
-Be creative! do whatever you want!
-
-- Install click or typer and create a CLI app
-- Use builtin argparse
-- Start a web application
-- Import things from your .base module
-"""
+import pandas as pd
+import psutil
+import argparse
+import os
+import tempfile
+from . import logparser
+import signal
 
 
 def main():  # pragma: no cover
-    """
-    The main function executes on commands:
-    `python -m hiddify_monitoring` and `$ hiddify_monitoring `.
+    from . import geolocator
+    parser = argparse.ArgumentParser(
+        prog='Hiddify Monitoring',
+        description='parse nginx log, anonymize it and provide meaningful info',
+        epilog='Hiddify')
 
-    This is your program's entry point.
+    parser.add_argument('nginx_log_file')
+    parser.add_argument('out_folder', default='out',nargs='?')
+    args = parser.parse_args()
+    print(args)
+    process(args.nginx_log_file, args.out_folder)
+    print('done')
 
-    You can change this function to do whatever you want.
-    Examples:
-        * Run a test suite
-        * Run a server
-        * Do some other stuff
-        * Run a command line application (Click, Typer, ArgParse)
-        * List all available tasks
-        * Run an application (Flask, FastAPI, Django, etc.)
-    """
-    print("This will do something")
+
+def process(orig_nginx_log, out_folder):
+    if not os.path.isfile(orig_nginx_log):
+        raise Exception('Error! logfile not found')
+    is_test='tests/test.log' in orig_nginx_log
+    
+    
+    processing_file = f'{orig_nginx_log}'
+    if not is_test:
+        processing_file += f'.processing'
+        
+    try:
+        os.rename(orig_nginx_log, processing_file)
+        pass
+    except:
+        raise
+        pass
+    send_signal_to_nginx()
+    analyse(processing_file, out_folder)
+
+    if not is_test:
+        os.remove(processing_file)
+
+
+def analyse(logfile, out_folder):
+    df = convertlog(logfile)
+
+    # df.rolling('1d').sum()
+    uniqueusers = len(df.loc[df['status'] == 200]['haship'].unique())
+    print(uniqueusers)
+
+    def defgroups(ddf):
+        return [ddf.index.year, ddf.index.month, ddf.index.day, ddf.index.hour]
+
+    def calc_items(ddf):
+        res = ddf[['download', 'upload', 'connectiontime']].sum()
+        # names=list(res.index.names)
+        # names[0]='year';names[1]='month';names[2]='day';names[3]='hour'
+        # res.index.names=names
+        return res
+
+    # df=df.loc[(df['download']>100000) |(df['upload']>100000)]
+    per_hour_df = calc_items(df.groupby(df.index.round('1h')))
+
+    h1 = pd.to_timedelta('1h')
+
+    for row in per_hour_df.index:
+        # row=row.round('1h')
+        print(row)
+        df2 = df.loc[(df.index >= row) & (df.index < row+h1)]
+        per_proto_df = calc_items(df2.groupby(['status', 'upstream']))
+        per_city_df = calc_items(df2.groupby(
+            ['status', 'upstream', 'country_code', 'province', 'city']))
+        per_asn_df = calc_items(df2.groupby(
+            ['status', 'upstream', 'asn_name']))
+        add_log(row, 'proto', per_proto_df, out_folder)
+        add_log(row, 'city', per_city_df, out_folder)
+        add_log(row, 'asn', per_asn_df, out_folder)
+
+
+def add_log(dateh, typ, df, out_folder):
+
+    folder = f'{out_folder}/{typ}'
+    os.makedirs(folder, exist_ok=True)
+    filepath = f'{folder}/{dateh.strftime("%Y%m%d-%H")}.csv'
+    old_df = None
+    if os.path.isfile(filepath):
+        old_df = pd.read_csv(filepath, index_col=df.index.names)
+
+    # display(df)
+    # display(old_df)
+    if old_df is not None:
+        df = df.add(old_df, fill_value=0)
+    # df = df.drop(['up/s', 'dl/s'], axis=1, errors='ignore')
+    # df['up/s'] = (df['upload']/df['connectiontime']).fillna(0).astype(int)
+    # df['dl/s'] = (df['download']/df['connectiontime']).fillna(0).astype(int)
+    df.to_csv(filepath)
+
+
+def send_signal_to_nginx():
+    PROCNAME = "nginx"
+    for proc in psutil.process_iter():
+        if PROCNAME in proc.name():
+            os.kill(proc.pid, signal.SIGUSR1)
+
+
+def convertlog(logpath):
+    print('ddddddddd',logpath)
+    with open(logpath, 'r',encoding='utf-8') as f:
+        all = [logparser.parse(l) for l in f.readlines()]
+
+    import pandas as pd
+
+    df = pd.DataFrame(all)
+    # all
+    df = pd.concat([df.drop('ipinfo', axis=1),
+                   pd.DataFrame(df['ipinfo'].tolist())], axis=1)
+    df = df.set_index('dateandtime')
+
+    return df
