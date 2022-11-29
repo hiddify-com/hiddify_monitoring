@@ -104,7 +104,8 @@ def add_log(dateh, typ, df, out_folder):
     # df = df.drop(['up/s', 'dl/s'], axis=1, errors='ignore')
     # df['up/s'] = (df['upload']/df['connectiontime']).fillna(0).astype(int)
     # df['dl/s'] = (df['download']/df['connectiontime']).fillna(0).astype(int)
-    df.to_csv(filepath)
+    if len(df.index)>0:
+        df.to_csv(filepath)
 
 
 def send_signal_to_nginx():
