@@ -6,7 +6,9 @@ import os
 def rel_path(filename):
     """Return the path of this filename relative to the current script
     """
-    return os.path.join(os.getcwd(), os.path.dirname(__file__), f'../geodb/{filename}')
+    res= f'{os.path.dirname(__file__)}/geodb/{filename}'
+    return res
+    # return os.path.join(os.getcwd(), os.path.dirname(__file__), f'../geodb/{filename}')
 
 
 ipcity = maxminddb.open_database(rel_path('GeoLite2-City.mmdb'))

@@ -147,8 +147,8 @@ def get_persian(strlist):
 def rel_path(filename):
     """Return the path of this filename relative to the current script
     """
-    res= f'{os.path.dirname(__file__)}/../geodb/{filename}'
-    print(filename,res)
+    res= f'{os.path.dirname(__file__)}/geodb/{filename}'
+    # print(filename,res)
     
     return res
 
