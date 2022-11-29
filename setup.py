@@ -42,6 +42,7 @@ setup(
     entry_points={
         "console_scripts": ["hiddify_monitoring = hiddify_monitoring.__main__:main"]
     },
-    package_data= {"hiddify_monitoring": ["hiddify_monitoring/geodb/*"]},
+    include_package_data=True,
+    package_data= {"hiddify_monitoring": ["hiddify_monitoring/geodb/*.*"]},
     extras_require={"test": read_requirements("requirements-test.txt")},
 )
