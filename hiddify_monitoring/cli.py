@@ -31,7 +31,7 @@ def process(orig_nginx_log, out_folder):
     processing_file = f'{orig_nginx_log}'
     if not is_test:
         processing_file += f'.processing'
-        
+
     try:
         os.rename(orig_nginx_log, processing_file)
         pass
@@ -49,8 +49,8 @@ def analyse(logfile, out_folder):
     df = convertlog(logfile)
 
     # df.rolling('1d').sum()
-    uniqueusers = len(df.loc[df['status'] == 200]['haship'].unique())
-    print(uniqueusers)
+    
+    
 
     def defgroups(ddf):
         return [ddf.index.year, ddf.index.month, ddf.index.day, ddf.index.hour]
@@ -80,6 +80,10 @@ def analyse(logfile, out_folder):
         add_log(row, 'city', per_city_df, out_folder)
         add_log(row, 'asn', per_asn_df, out_folder)
 
+        uniqueusers = df2.groupby(['haship','upstream'])[['haship']].count().rename(columns={'haship':'connection_count'})
+        
+        add_log(row,'users',uniqueusers,out_folder)
+
 
 def add_log(dateh, typ, df, out_folder):
 
@@ -93,6 +97,9 @@ def add_log(dateh, typ, df, out_folder):
     # display(df)
     # display(old_df)
     if old_df is not None:
+        # if typ=='users':
+        #     df=pd.concat([old_df,df], ignore_index=True, sort=False).drop_duplicates(subset=['haship'])
+        # else:
         df = df.add(old_df, fill_value=0)
     # df = df.drop(['up/s', 'dl/s'], axis=1, errors='ignore')
     # df['up/s'] = (df['upload']/df['connectiontime']).fillna(0).astype(int)

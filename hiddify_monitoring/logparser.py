@@ -1,6 +1,7 @@
 import re
 from datetime import datetime
 from . import ipresolver
+import hashlib
 
 upstream_map = {'127.0.0.1:447': 'ss-faketls', '127.0.0.1:449': 'telegram-faketls', '127.0.0.1:448': 'v2ray', '127.0.0.1:445': 'vmess', '8.8.8.8:443': 'dns'}
 lineformat = re.compile(
@@ -20,6 +21,9 @@ def parse(line):
         datadic['upload'] = int(datadic['upload'])
         datadic['status'] = int(datadic['status'])
 
-        datadic['haship'] = abs(hash(f"{datadic['ipinfo']['asn_name']}{date}{hash(datadic['ipaddress'])}"))
+        datadic['haship'] = haship(f"{datadic['ipinfo']['asn_name']}{date}{haship(datadic['ipaddress'])}")
         del datadic['ipaddress']
         return datadic
+
+def haship(str):
+    return int(hashlib.sha1(str.encode("utf-8")).hexdigest(), 16)% (10 ** 8)
