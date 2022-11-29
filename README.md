@@ -9,20 +9,15 @@ A monitoring library for hiddify-config
 pip install hiddify_monitoring
 ``` -->
 
+```bash
+pip install git+https://github.com/hiddify/hiddify-monitoring
+```
 ## Usage
 
-```py
-from hiddify_monitoring import BaseClass
-from hiddify_monitoring import base_function
-
-BaseClass().base_method()
-base_function()
-```
-
 ```bash
-$ python -m hiddify_monitoring
+$ python -m hiddify_monitoring log_file out_folder
 #or
-$ hiddify_monitoring
+$ hiddify_monitoring log_file out_folder
 ```
 
 ## Development
