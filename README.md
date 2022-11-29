@@ -40,7 +40,7 @@ See also
 - ✅ Code linting using [flake8](https://flake8.pycqa.org/en/latest/)
 - 📊 Code coverage reports using [codecov](https://about.codecov.io/sign-up/)
 - 🛳️ Automatic release to [PyPI](https://pypi.org) using [twine](https://twine.readthedocs.io/en/latest/) and github actions.
-- 🎯 Entry points to execute your program using `python -m <project_name>` or `$ project_name` with basic CLI argument parsing.
+- 🎯 Entry points to execute your program using `python -m <hiddify_monitoring>` or `$ hiddify_monitoring` with basic CLI argument parsing.
 - 🔄 Continuous integration using [Github Actions](.github/workflows/) with jobs to lint, test and release your project on Linux, Mac and Windows environments.
 
 > Curious about architectural decisions on this template? read [ABOUT_THIS_TEMPLATE.md](ABOUT_THIS_TEMPLATE.md)  
@@ -51,33 +51,33 @@ See also
 <!--  DELETE THE LINES ABOVE THIS AND WRITE YOUR PROJECT README BELOW -->
 
 ---
-# project_name
+# hiddify_monitoring
 
-[![codecov](https://codecov.io/gh/author_name/project_urlname/branch/main/graph/badge.svg?token=project_urlname_token_here)](https://codecov.io/gh/author_name/project_urlname)
-[![CI](https://github.com/author_name/project_urlname/actions/workflows/main.yml/badge.svg)](https://github.com/author_name/project_urlname/actions/workflows/main.yml)
+[![codecov](https://codecov.io/gh/hiddify/hiddify-monitoring/branch/main/graph/badge.svg?token=hiddify-monitoring_token_here)](https://codecov.io/gh/hiddify/hiddify-monitoring)
+[![CI](https://github.com/hiddify/hiddify-monitoring/actions/workflows/main.yml/badge.svg)](https://github.com/hiddify/hiddify-monitoring/actions/workflows/main.yml)
 
-project_description
+Awesome hiddify_monitoring created by hiddify
 
 ## Install it from PyPI
 
 ```bash
-pip install project_name
+pip install hiddify_monitoring
 ```
 
 ## Usage
 
 ```py
-from project_name import BaseClass
-from project_name import base_function
+from hiddify_monitoring import BaseClass
+from hiddify_monitoring import base_function
 
 BaseClass().base_method()
 base_function()
 ```
 
 ```bash
-$ python -m project_name
+$ python -m hiddify_monitoring
 #or
-$ project_name
+$ hiddify_monitoring
 ```
 
 ## Development
