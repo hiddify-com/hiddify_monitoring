@@ -118,11 +118,12 @@ def send_signal_to_nginx():
 def convertlog(logpath):
     print('ddddddddd',logpath)
     with open(logpath, 'r',encoding='utf-8') as f:
-        all = [logparser.parse(l) for l in f.readlines()]
+        alldata = [logparser.parse(l) for l in f.readlines()]
+        alldata = [l for l in alldata if l is not None]
 
     import pandas as pd
-
-    df = pd.DataFrame(all)
+    
+    df = pd.DataFrame(alldata)
     # all
     df = pd.concat([df.drop('ipinfo', axis=1),
                    pd.DataFrame(df['ipinfo'].tolist())], axis=1)

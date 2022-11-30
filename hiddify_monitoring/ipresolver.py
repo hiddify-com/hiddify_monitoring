@@ -1,7 +1,8 @@
 from datetime import datetime
+import os
 import maxminddb
 from . import geolocator
-import os
+
 
 def rel_path(filename):
     """Return the path of this filename relative to the current script
