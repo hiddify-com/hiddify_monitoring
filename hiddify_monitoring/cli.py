@@ -80,7 +80,7 @@ def analyse(logfile, out_folder):
         add_log(row, 'city', per_city_df, out_folder)
         add_log(row, 'asn', per_asn_df, out_folder)
 
-        uniqueusers = df2.groupby(['upstream','haship'])[['haship']].count().rename(columns={'haship':'connection_count'})
+        uniqueusers = df2.groupby(['status','upstream','haship'])[['haship']].count().rename(columns={'haship':'connection_count'})
         
         add_log(row,'users',uniqueusers,out_folder)
 
