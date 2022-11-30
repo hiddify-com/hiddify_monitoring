@@ -63,7 +63,7 @@ def analyse(logfile, out_folder):
         return res
 
     # df=df.loc[(df['download']>100000) |(df['upload']>100000)]
-    per_hour_df = calc_items(df.groupby(df.index.round('1h')))
+    per_hour_df = calc_items(df.groupby(df.index.floor('1h')))
 
     h1 = pd.to_timedelta('1h')
 
@@ -116,7 +116,7 @@ def send_signal_to_nginx():
 
 
 def convertlog(logpath):
-    print('ddddddddd',logpath)
+    print('converting ',logpath)
     with open(logpath, 'r',encoding='utf-8') as f:
         alldata = [logparser.parse(l) for l in f.readlines()]
         alldata = [l for l in alldata if l is not None]
