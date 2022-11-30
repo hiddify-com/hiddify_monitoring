@@ -3,7 +3,7 @@ from datetime import datetime
 from . import ipresolver
 import hashlib
 
-upstream_map = {'127.0.0.1:447': 'ss-faketls', '127.0.0.1:449': 'telegram-faketls', '127.0.0.1:448': 'v2ray', '127.0.0.1:445': 'vmess', '8.8.8.8:443': 'dns'}
+upstream_map = {'127.0.0.1:447':'monitoring','127.0.0.1:447': 'ss-faketls', '127.0.0.1:449': 'telegram-faketls', '127.0.0.1:448': 'v2ray', '127.0.0.1:445': 'vmess', '8.8.8.8:443': 'dns'}
 lineformat = re.compile(
     r"""\[(?P<dateandtime>\d{2}\/[a-z]{3}\/\d{4}:\d{2}:\d{2}:\d{2} (\+|\-)\d{4})\] (?P<ipaddress>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) (?P<upstream>[0-9.:\-\W]+) (?P<status>\d+) (?P<download>\d+) (?P<upload>\d+) (?P<connectiontime>\d+)""", re.IGNORECASE)
 
