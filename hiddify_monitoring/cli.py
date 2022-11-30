@@ -92,7 +92,7 @@ def add_log(dateh, typ, df, out_folder):
     filepath = f'{folder}/{dateh.strftime("%Y%m%d-%H")}.csv'
     old_df = None
     if os.path.isfile(filepath):
-        old_df = pd.read_csv(filepath, index_col=df.index.names,dtype={'haship':'Int32'})
+        old_df = pd.read_csv(filepath, index_col=df.index.names,dtype={'haship':'Int64'})
 
     # display(df)
     # display(old_df)
