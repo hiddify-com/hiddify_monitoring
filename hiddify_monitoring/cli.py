@@ -15,7 +15,7 @@ def main():  # pragma: no cover
         epilog='Hiddify')
 
     parser.add_argument('nginx_log_file')
-    parser.add_argument('out_folder', default='out',nargs='?')
+    parser.add_argument('out_folder', default='out', nargs='?')
     args = parser.parse_args()
     print(args)
     process(args.nginx_log_file, args.out_folder)
@@ -25,9 +25,8 @@ def main():  # pragma: no cover
 def process(orig_nginx_log, out_folder):
     if not os.path.isfile(orig_nginx_log):
         raise Exception('Error! logfile not found')
-    is_test='tests/test.log' in orig_nginx_log
-    
-    
+    is_test = 'tests/test.log' in orig_nginx_log
+
     processing_file = f'{orig_nginx_log}'
     if not is_test:
         processing_file += f'.processing'
@@ -49,14 +48,12 @@ def analyse(logfile, out_folder):
     df = convertlog(logfile)
 
     # df.rolling('1d').sum()
-    
-    
 
     def defgroups(ddf):
         return [ddf.index.year, ddf.index.month, ddf.index.day, ddf.index.hour]
 
     def calc_items(ddf):
-        res = ddf[['download', 'upload', 'connectiontime']].sum()
+        res = ddf[['download', 'upload', 'connectiontime','haship']].agg({'download':'sum','upload':'sum','connectiontime': 'sum','haship':'count'}).rename(columns={'haship':'connections'})
         # names=list(res.index.names)
         # names[0]='year';names[1]='month';names[2]='day';names[3]='hour'
         # res.index.names=names
@@ -80,9 +77,14 @@ def analyse(logfile, out_folder):
         add_log(row, 'city', per_city_df, out_folder)
         add_log(row, 'asn', per_asn_df, out_folder)
 
-        uniqueusers = df2.groupby(['status','upstream','haship'])[['haship']].count().rename(columns={'haship':'connection_count'})
+        full_df = calc_items(df2.groupby(['status', 'upstream', 'country_code', 'province', 'city', 'asn_name', 'haship']))
         
-        add_log(row,'users',uniqueusers,out_folder)
+        add_log(row, 'full', full_df, out_folder)
+
+        uniqueusers = df2.groupby(['status', 'upstream', 'haship'])[
+            ['haship']].count().rename(columns={'haship': 'connection_count'})
+
+        add_log(row, 'users', uniqueusers, out_folder)
 
 
 def add_log(dateh, typ, df, out_folder):
@@ -92,7 +94,8 @@ def add_log(dateh, typ, df, out_folder):
     filepath = f'{folder}/{dateh.strftime("%H")}.csv'
     old_df = None
     if os.path.isfile(filepath):
-        old_df = pd.read_csv(filepath, index_col=df.index.names,dtype={'haship':'Int64'})
+        old_df = pd.read_csv(filepath, index_col=df.index.names, dtype={
+                             'haship': 'Int64'})
 
     # display(df)
     # display(old_df)
@@ -104,7 +107,7 @@ def add_log(dateh, typ, df, out_folder):
     # df = df.drop(['up/s', 'dl/s'], axis=1, errors='ignore')
     # df['up/s'] = (df['upload']/df['connectiontime']).fillna(0).astype(int)
     # df['dl/s'] = (df['download']/df['connectiontime']).fillna(0).astype(int)
-    if len(df.index)>0:
+    if len(df.index) > 0:
         df.to_csv(filepath)
 
 
@@ -116,13 +119,13 @@ def send_signal_to_nginx():
 
 
 def convertlog(logpath):
-    print('converting ',logpath)
-    with open(logpath, 'r',encoding='utf-8') as f:
+    print('converting ', logpath)
+    with open(logpath, 'r', encoding='utf-8') as f:
         alldata = [logparser.parse(l) for l in f.readlines()]
         alldata = [l for l in alldata if l is not None]
 
     import pandas as pd
-    
+
     df = pd.DataFrame(alldata)
     # all
     df = pd.concat([df.drop('ipinfo', axis=1),
