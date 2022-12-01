@@ -53,7 +53,7 @@ def analyse(logfile, out_folder):
         return [ddf.index.year, ddf.index.month, ddf.index.day, ddf.index.hour]
 
     def calc_items(ddf):
-        res = ddf[['download', 'upload', 'connectiontime','haship']].agg({'download':'sum','upload':'sum','connectiontime': 'sum','haship':'count'}).rename(columns={'haship':'connections'})
+        res = ddf[['download', 'upload', 'connectiontime','haship']].agg({'download':'sum','upload':'sum','connectiontime': 'sum','haship':'count'}).rename(columns={'haship':'connection_count'})
         # names=list(res.index.names)
         # names[0]='year';names[1]='month';names[2]='day';names[3]='hour'
         # res.index.names=names
