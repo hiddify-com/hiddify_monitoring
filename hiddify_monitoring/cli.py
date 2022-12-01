@@ -87,9 +87,9 @@ def analyse(logfile, out_folder):
 
 def add_log(dateh, typ, df, out_folder):
 
-    folder = f'{out_folder}/{typ}'
+    folder = f'{out_folder}/{typ}/{dateh.strftime("%Y%m%d")}'
     os.makedirs(folder, exist_ok=True)
-    filepath = f'{folder}/{dateh.strftime("%Y%m%d-%H")}.csv'
+    filepath = f'{folder}/{dateh.strftime("%H")}.csv'
     old_df = None
     if os.path.isfile(filepath):
         old_df = pd.read_csv(filepath, index_col=df.index.names,dtype={'haship':'Int64'})
